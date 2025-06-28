@@ -6,7 +6,7 @@
 
 - **Runtime:** Node.js (ESM syntax)
 - **Framework:** Express.js
-- **Database:** PostgreSQL or MySQL (based on schema)
+- **Database:** MySQL (based on giv.sql schema)
 - **ORM:** Prisma / Sequelize / Knex (recommend Prisma)
 - **Authentication:** JWT + bcrypt, optional OAuth
 - **File Storage:** AWS S3 / Cloudflare R2 or local
@@ -49,8 +49,8 @@ giv-backend/
 ## 🔐 3. Authentication & Authorization
 
 ### Tables:
-- `User`
-- `RolePermission`
+- `users`
+- `role_permissions`
 
 ### Features:
 - JWT login for Volunteers, Donors, Admins, Editors
@@ -63,12 +63,12 @@ giv-backend/
 ## 👤 4. User Management
 
 ### Volunteer:
-- `User` + `VolunteerProfile`
+- `users` + `volunteer_profiles`
 - Tracks skills, availability, training, hours
 - Event registration, certificate downloads
 
 ### Donor:
-- `User` + `DonorProfile`
+- `users` + `donor_profiles`
 - Tracks donation history, preferences
 
 ### Features:
@@ -82,8 +82,8 @@ giv-backend/
 ## 💳 5. Donation System
 
 ### Tables:
-- `Donation`
-- `Campaign`
+- `donations`
+- `campaigns`
 
 ### Features:
 - One-time and recurring donations
@@ -97,8 +97,8 @@ giv-backend/
 ## 📅 6. Event Management
 
 ### Tables:
-- `Event`
-- `EventParticipant`
+- `events`
+- `event_participants`
 
 ### Features:
 - Public calendar with filters
@@ -112,9 +112,9 @@ giv-backend/
 ## 🪧 7. Content Management (CMS)
 
 ### Tables:
-- `Post`
-- `FAQ`
-- `ContactMessage`
+- `posts`
+- `faqs`
+- `contact_messages`
 
 ### Features:
 - Multilingual blog, news, press releases
@@ -127,8 +127,8 @@ giv-backend/
 ## 🎥 8. Media & Document Management
 
 ### Tables:
-- `Media` (images, videos, PDFs)
-- `Document` (reports, brochures)
+- `media` (images, videos, PDFs)
+- `documents` (reports, brochures)
 
 ### Features:
 - File upload and linking
@@ -141,8 +141,10 @@ giv-backend/
 ## 🙋‍♀️ 9. Volunteer System
 
 ### Tables:
-- `VolunteerProfile`
-- Training files in `Media` or separate
+- `volunteer_profiles`
+- `volunteer_skills`
+- `skills`
+- Training files in `media` or separate
 
 ### Features:
 - Volunteer application forms
@@ -155,9 +157,9 @@ giv-backend/
 ## 📢 10. Testimonials, Partners & Newsletter
 
 ### Tables:
-- `Testimonial`
-- `Partner`
-- `NewsletterSubscriber`
+- `testimonials`
+- `partners`
+- `newsletter_subscribers`
 
 ### Features:
 - Testimonials with role and image
@@ -170,8 +172,8 @@ giv-backend/
 ## 📈 11. Impact & Analytics
 
 ### Tables:
-- `SiteInteraction`
-- `Campaign` (progress bar)
+- `site_interactions`
+- `campaigns` (progress bar)
 
 ### Features:
 - Real-time impact stats
@@ -230,21 +232,42 @@ giv-backend/
 
 ## ✅ Summary of Key Components (Database Tables)
 
-| Feature                 | Table(s) Involved                            |
-|------------------------|----------------------------------------------|
-| Authentication         | `User`, `RolePermission`                     |
-| Volunteers             | `VolunteerProfile`, `EventParticipant`       |
-| Donors                 | `DonorProfile`, `Donation`                   |
-| Donations              | `Donation`, `Campaign`                       |
-| Events                 | `Event`, `EventParticipant`                  |
-| Programs               | `Program`, `Media`, `Testimonial`           |
-| CMS (Blog/News)        | `Post`, `FAQ`, `Media`                       |
-| Media Center           | `Media`, `Document`                          |
-| Contact & Feedback     | `ContactMessage`, `Testimonial`             |
-| Partners               | `Partner`                                    |
-| Newsletter             | `NewsletterSubscriber`                       |
-| Site Activity          | `SiteInteraction`                            |
-| Emails                 | `EmailLog`                                   |
+| Feature                 | Table(s) Involved                                    |
+|------------------------|------------------------------------------------------|
+| Authentication         | `users`, `role_permissions`                          |
+| Volunteers             | `volunteer_profiles`, `volunteer_skills`, `skills`   |
+| Donors                 | `donor_profiles`, `donations`                        |
+| Donations              | `donations`, `campaigns`                             |
+| Events                 | `events`, `event_participants`                       |
+| Programs               | `programs`, `media`, `testimonials`                  |
+| CMS (Blog/News)        | `posts`, `faqs`, `media`                             |
+| Media Center           | `media`, `documents`                                 |
+| Contact & Feedback     | `contact_messages`, `testimonials`                   |
+| Partners               | `partners`                                           |
+| Newsletter             | `newsletter_subscribers`                             |
+| Site Activity          | `site_interactions`                                  |
+| Emails                 | `email_logs`                                         |
+
+---
+
+## 🌐 16. Multilingual Support
+
+### Tables with Language Support:
+- `campaigns` - Campaign titles and descriptions
+- `events` - Event details and descriptions
+- `programs` - Program information
+- `posts` - Blog posts and news articles
+- `media` - Media titles and descriptions
+- `testimonials` - User testimonials
+- `faqs` - Frequently asked questions
+- `partners` - Partner information and quotes
+- `documents` - Document titles and descriptions
+
+### Implementation:
+- `language` field: ENUM('en', 'am') for English and Amharic
+- `translation_group_id` field: Links different language versions
+- Automatic UUID generation for translation groups
+- Language-based content filtering and retrieval
 
 ---
 
