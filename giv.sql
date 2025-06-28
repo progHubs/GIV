@@ -82,13 +82,17 @@ CREATE TABLE campaigns (
     donor_count INT UNSIGNED DEFAULT 0,
     success_stories JSON,
     created_by BIGINT UNSIGNED,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
     FOREIGN KEY (created_by) REFERENCES users(id),
     INDEX idx_slug (slug),
     INDEX idx_category (category),
-    INDEX idx_active_featured (is_active, is_featured)
+    INDEX idx_active_featured (is_active, is_featured),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id)
 ) ENGINE=InnoDB;
 
 -- Donations table
@@ -142,6 +146,8 @@ CREATE TABLE events (
     ticket_link VARCHAR(512),
     is_featured BOOLEAN DEFAULT FALSE,
     created_by BIGINT UNSIGNED,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
@@ -149,7 +155,9 @@ CREATE TABLE events (
     INDEX idx_slug (slug),
     INDEX idx_event_date (event_date),
     INDEX idx_status (status),
-    SPATIAL INDEX idx_location (latitude, longitude)
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id),
+    INDEX idx_location_coords (latitude, longitude)
 ) ENGINE=InnoDB;
 
 -- Event participants table
@@ -181,12 +189,16 @@ CREATE TABLE programs (
     impact_stats JSON,
     is_featured BOOLEAN DEFAULT FALSE,
     created_by BIGINT UNSIGNED,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
     FOREIGN KEY (created_by) REFERENCES users(id),
     INDEX idx_category (category),
-    INDEX idx_date_range (start_date, end_date)
+    INDEX idx_date_range (start_date, end_date),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id)
 ) ENGINE=InnoDB;
 
 -- Posts table
@@ -199,11 +211,14 @@ CREATE TABLE posts (
     author_id BIGINT UNSIGNED,
     feature_image VARCHAR(512),
     language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES users(id),
     INDEX idx_slug (slug),
     INDEX idx_post_type (post_type),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id),
     FULLTEXT INDEX idx_content (title, content)
 ) ENGINE=InnoDB;
 
@@ -217,11 +232,176 @@ CREATE TABLE media (
     related_event_id BIGINT UNSIGNED,
     related_program_id BIGINT UNSIGNED,
     uploaded_by BIGINT UNSIGNED,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (related_event_id) REFERENCES events(id) ON DELETE SET NULL,
     FOREIGN KEY (related_program_id) REFERENCES programs(id) ON DELETE SET NULL,
     FOREIGN KEY (uploaded_by) REFERENCES users(id),
-    INDEX idx_media_type (media_type)
+    INDEX idx_media_type (media_type),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id)
+) ENGINE=InnoDB;
+
+-- Testimonials table
+CREATE TABLE testimonials (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(100),
+    message TEXT NOT NULL,
+    image_url VARCHAR(512),
+    type ENUM('volunteer', 'beneficiary', 'partner') NOT NULL,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
+    is_featured BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_type (type),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id),
+    INDEX idx_featured (is_featured)
+) ENGINE=InnoDB;
+
+-- FAQ table
+CREATE TABLE faqs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    category VARCHAR(50),
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
+    is_active BOOLEAN DEFAULT TRUE,
+    sort_order INT UNSIGNED DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_category (category),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id),
+    INDEX idx_active_order (is_active, sort_order)
+) ENGINE=InnoDB;
+
+-- Partners table
+CREATE TABLE partners (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    logo_url VARCHAR(512),
+    type ENUM('ngo', 'corporate', 'government', 'diaspora') NOT NULL,
+    website VARCHAR(512),
+    contact_email VARCHAR(255),
+    quote TEXT,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
+    is_active BOOLEAN DEFAULT TRUE,
+    partnership_start_date DATE,
+    partnership_end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_type (type),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB;
+
+-- Contact messages table
+CREATE TABLE contact_messages (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
+    message TEXT NOT NULL,
+    reason ENUM('general', 'volunteering', 'media', 'donations') NOT NULL,
+    status ENUM('new', 'read', 'replied', 'closed') DEFAULT 'new',
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    replied_at TIMESTAMP NULL,
+    INDEX idx_status (status),
+    INDEX idx_reason (reason),
+    INDEX idx_submitted_at (submitted_at)
+) ENGINE=InnoDB;
+
+-- Documents table
+CREATE TABLE documents (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(50),
+    file_url VARCHAR(512) NOT NULL,
+    file_size BIGINT UNSIGNED,
+    file_type VARCHAR(50),
+    uploaded_by BIGINT UNSIGNED,
+    language ENUM('en', 'am') DEFAULT 'en',
+    translation_group_id VARCHAR(36),
+    is_public BOOLEAN DEFAULT FALSE,
+    download_count INT UNSIGNED DEFAULT 0,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (uploaded_by) REFERENCES users(id),
+    INDEX idx_category (category),
+    INDEX idx_language (language),
+    INDEX idx_translation_group (translation_group_id),
+    INDEX idx_public (is_public)
+) ENGINE=InnoDB;
+
+-- Newsletter subscribers table
+CREATE TABLE newsletter_subscribers (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    is_active BOOLEAN DEFAULT TRUE,
+    language_preference ENUM('en', 'am') DEFAULT 'en',
+    subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    unsubscribed_at TIMESTAMP NULL,
+    INDEX idx_email (email),
+    INDEX idx_active (is_active)
+) ENGINE=InnoDB;
+
+-- Role permissions table
+CREATE TABLE role_permissions (
+    role ENUM('admin', 'editor', 'volunteer_manager') NOT NULL,
+    permission VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (role, permission),
+    INDEX idx_role (role),
+    INDEX idx_permission (permission)
+) ENGINE=InnoDB;
+
+-- Email logs table
+CREATE TABLE email_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    recipient VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
+    template_used VARCHAR(100),
+    content TEXT,
+    status ENUM('sent', 'failed', 'bounced', 'opened', 'clicked') NOT NULL,
+    error_message TEXT,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    opened_at TIMESTAMP NULL,
+    clicked_at TIMESTAMP NULL,
+    INDEX idx_recipient (recipient),
+    INDEX idx_status (status),
+    INDEX idx_sent_at (sent_at),
+    INDEX idx_template (template_used)
+) ENGINE=InnoDB;
+
+-- Site interactions table
+CREATE TABLE site_interactions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED,
+    session_id VARCHAR(100),
+    page VARCHAR(255),
+    action VARCHAR(100),
+    metadata JSON,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    occurred_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_user_id (user_id),
+    INDEX idx_session_id (session_id),
+    INDEX idx_page (page),
+    INDEX idx_action (action),
+    INDEX idx_occurred_at (occurred_at)
 ) ENGINE=InnoDB;
 
 -- Skills table
@@ -247,28 +427,88 @@ CREATE TABLE volunteer_skills (
     INDEX idx_proficiency (proficiency_level)
 ) ENGINE=InnoDB;
 
--- Add triggers for UUID generation
+-- Add triggers for UUID generation (if needed for translation_group_id)
 DELIMITER //
 
-CREATE TRIGGER before_insert_users
-BEFORE INSERT ON users
-FOR EACH ROW
-BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
-    END IF;
-END//
-
--- Repeat for other tables that need UUID generation
 CREATE TRIGGER before_insert_campaigns
 BEFORE INSERT ON campaigns
 FOR EACH ROW
 BEGIN
-    IF NEW.id IS NULL THEN
-        SET NEW.id = UUID();
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
     END IF;
 END//
 
--- Add more similar triggers for other tables
+CREATE TRIGGER before_insert_events
+BEFORE INSERT ON events
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_programs
+BEFORE INSERT ON programs
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_posts
+BEFORE INSERT ON posts
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_media
+BEFORE INSERT ON media
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_testimonials
+BEFORE INSERT ON testimonials
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_faqs
+BEFORE INSERT ON faqs
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_partners
+BEFORE INSERT ON partners
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
+
+CREATE TRIGGER before_insert_documents
+BEFORE INSERT ON documents
+FOR EACH ROW
+BEGIN
+    IF NEW.translation_group_id IS NULL THEN
+        SET NEW.translation_group_id = UUID();
+    END IF;
+END//
 
 DELIMITER ;
