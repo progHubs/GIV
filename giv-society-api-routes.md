@@ -40,6 +40,9 @@ Base URL: `/api/v1/`
 | POST   | /volunteers             | Create volunteer profile |
 | PATCH  | /volunteers/:id         | Update volunteer profile |
 | GET    | /volunteers/:id/certificate | Get/download certificate |
+| GET    | /volunteers/:id/skills  | Get volunteer skills |
+| POST   | /volunteers/:id/skills  | Add skill to volunteer |
+| DELETE | /volunteers/:id/skills/:skillId | Remove skill from volunteer |
 
 ---
 
@@ -63,6 +66,7 @@ Base URL: `/api/v1/`
 | POST   | /campaigns            | Create campaign (admin) |
 | PATCH  | /campaigns/:id        | Update campaign (admin) |
 | DELETE | /campaigns/:id        | Delete campaign |
+| GET    | /campaigns/:id/translations | Get all language versions |
 
 ---
 
@@ -71,7 +75,7 @@ Base URL: `/api/v1/`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET    | /donations            | List all donations (admin) |
-| GET    | /donations/me         | Get logged-in user’s donations |
+| GET    | /donations/me         | Get logged-in user's donations |
 | POST   | /donations            | Make a donation |
 | GET    | /donations/:id        | Get specific donation |
 | GET    | /donations/:id/receipt| Get/download receipt (PDF) |
@@ -87,6 +91,7 @@ Base URL: `/api/v1/`
 | POST   | /events               | Create new event |
 | PATCH  | /events/:id           | Update event |
 | DELETE | /events/:id           | Delete event |
+| GET    | /events/:id/translations | Get all language versions |
 
 ---
 
@@ -97,6 +102,7 @@ Base URL: `/api/v1/`
 | GET    | /events/:id/participants | List all participants |
 | POST   | /events/:id/register     | Register for event |
 | DELETE | /events/:id/unregister   | Remove self from event |
+| PATCH  | /events/:id/participants/:userId | Update participant status |
 
 ---
 
@@ -109,6 +115,7 @@ Base URL: `/api/v1/`
 | POST   | /programs             | Create new program |
 | PATCH  | /programs/:id         | Update program |
 | DELETE | /programs/:id         | Delete program |
+| GET    | /programs/:id/translations | Get all language versions |
 
 ---
 
@@ -121,6 +128,7 @@ Base URL: `/api/v1/`
 | POST   | /posts               | Create post |
 | PATCH  | /posts/:id           | Update post |
 | DELETE | /posts/:id           | Delete post |
+| GET    | /posts/:id/translations | Get all language versions |
 
 ---
 
@@ -131,6 +139,7 @@ Base URL: `/api/v1/`
 | GET    | /media               | List all media |
 | POST   | /media               | Upload media |
 | DELETE | /media/:id           | Delete media |
+| GET    | /media/:id/translations | Get all language versions |
 
 ---
 
@@ -141,6 +150,8 @@ Base URL: `/api/v1/`
 | GET    | /documents            | List documents |
 | POST   | /documents            | Upload document |
 | DELETE | /documents/:id        | Delete document |
+| GET    | /documents/:id/download | Download document |
+| GET    | /documents/:id/translations | Get all language versions |
 
 ---
 
@@ -151,6 +162,7 @@ Base URL: `/api/v1/`
 | GET    | /testimonials         | List all testimonials |
 | POST   | /testimonials         | Create testimonial |
 | DELETE | /testimonials/:id     | Delete testimonial (admin) |
+| GET    | /testimonials/:id/translations | Get all language versions |
 
 ---
 
@@ -161,6 +173,7 @@ Base URL: `/api/v1/`
 | GET    | /partners             | List all partners |
 | POST   | /partners             | Create partner |
 | DELETE | /partners/:id         | Delete partner |
+| GET    | /partners/:id/translations | Get all language versions |
 
 ---
 
@@ -172,6 +185,7 @@ Base URL: `/api/v1/`
 | GET    | /contact-messages     | Admin get all messages |
 | GET    | /contact-messages/:id | View specific message |
 | DELETE | /contact-messages/:id | Delete message |
+| PATCH  | /contact-messages/:id/status | Update message status |
 
 ---
 
@@ -183,6 +197,7 @@ Base URL: `/api/v1/`
 | POST   | /faqs                | Add FAQ |
 | PATCH  | /faqs/:id            | Update FAQ |
 | DELETE | /faqs/:id            | Delete FAQ |
+| GET    | /faqs/:id/translations | Get all language versions |
 
 ---
 
@@ -192,6 +207,18 @@ Base URL: `/api/v1/`
 |--------|----------|-------------|
 | POST   | /newsletter/subscribe | Subscribe to newsletter |
 | GET    | /newsletter/subscribers | Admin view subscribers |
+| DELETE | /newsletter/unsubscribe | Unsubscribe from newsletter |
+
+---
+
+## 🛠️ Skills Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET    | /skills              | List all skills |
+| POST   | /skills              | Create new skill |
+| PATCH  | /skills/:id          | Update skill |
+| DELETE | /skills/:id          | Delete skill |
 
 ---
 
@@ -210,3 +237,14 @@ Base URL: `/api/v1/`
 |--------|----------|-------------|
 | GET    | /emails              | View email logs |
 | GET    | /emails/:id          | Get specific email log |
+
+---
+
+## 🌐 Multilingual Content
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET    | /content/:type/:id/translations | Get all translations for content |
+| POST   | /content/:type/:id/translations | Create translation |
+| PATCH  | /content/:type/:id/translations/:language | Update specific translation |
+| DELETE | /content/:type/:id/translations/:language | Delete specific translation |
