@@ -1,6 +1,6 @@
 # 🧱 Complete File Structure for GIV Society Backend
 
-This structure considers **backend scalability**, **JWT-based authentication**, **volunteer/donor systems**, **event & donation management**, **CMS**, **media handling**, **analytics**, **email**, and **multilingual support**.
+This structure considers **backend scalability**, **JWT-based authentication**, **volunteer/donor systems**, **event & donation management**, **CMS**, **media handling**, **analytics**, **email**, **multilingual support**, and **skills management**.
 
 ---
 
@@ -27,6 +27,7 @@ giv-backend/
 │   │   │   ├── faq.controller.js
 │   │   │   ├── contact.controller.js
 │   │   │   ├── newsletter.controller.js
+│   │   │   ├── skill.controller.js
 │   │   │   ├── analytics.controller.js
 │   │   │   └── email.controller.js
 │   │   ├── routes/
@@ -46,6 +47,7 @@ giv-backend/
 │   │   │   ├── faq.routes.js
 │   │   │   ├── contact.routes.js
 │   │   │   ├── newsletter.routes.js
+│   │   │   ├── skill.routes.js
 │   │   │   ├── analytics.routes.js
 │   │   │   └── email.routes.js
 │   │   ├── validators/
@@ -59,12 +61,15 @@ giv-backend/
 │   │   │   ├── program.validator.js
 │   │   │   ├── post.validator.js
 │   │   │   ├── contact.validator.js
-│   │   │   └── faq.validator.js
+│   │   │   ├── faq.validator.js
+│   │   │   ├── skill.validator.js
+│   │   │   └── translation.validator.js
 │   │   ├── middlewares/
 │   │   │   ├── auth.middleware.js
 │   │   │   ├── role.middleware.js
 │   │   │   ├── error.middleware.js
-│   │   │   └── validate.middleware.js
+│   │   │   ├── validate.middleware.js
+│   │   │   └── language.middleware.js
 │   ├── config/
 │   │   ├── db.config.js
 │   │   ├── jwt.config.js
@@ -95,7 +100,9 @@ giv-backend/
 │   │   ├── newsletterSubscriber.model.js
 │   │   ├── siteInteraction.model.js
 │   │   ├── emailLog.model.js
-│   │   └── rolePermission.model.js
+│   │   ├── rolePermission.model.js
+│   │   ├── skill.model.js
+│   │   └── volunteerSkill.model.js
 │   ├── prisma/                # If using Prisma ORM
 │   │   ├── schema.prisma
 │   │   └── seed.js
@@ -115,14 +122,17 @@ giv-backend/
 │   │   ├── analytics.service.js
 │   │   ├── contact.service.js
 │   │   ├── newsletter.service.js
-│   │   └── faq.service.js
+│   │   ├── faq.service.js
+│   │   ├── skill.service.js
+│   │   └── translation.service.js
 │   ├── utils/
 │   │   ├── jwt.util.js
 │   │   ├── hash.util.js
 │   │   ├── logger.util.js
 │   │   ├── response.util.js
 │   │   ├── i18n.util.js
-│   │   └── emailTemplate.util.js
+│   │   ├── emailTemplate.util.js
+│   │   └── translation.util.js
 │   ├── app.js
 │   └── server.js
 ├── uploads/                   # For local media files
@@ -131,6 +141,7 @@ giv-backend/
 │   ├── auth.test.js
 │   ├── user.test.js
 │   ├── donation.test.js
+│   ├── translation.test.js
 │   └── etc...
 ├── .env
 ├── .gitignore
@@ -141,4 +152,57 @@ giv-backend/
 
 ---
 
-This file structure includes everything required to implement a full-stack, production-ready backend system for the GIV Society project.
+## 📋 Key Model Files (MySQL Schema Compatible)
+
+### **Core Models:**
+- `user.model.js` - `users` table
+- `volunteerProfile.model.js` - `volunteer_profiles` table
+- `donorProfile.model.js` - `donor_profiles` table
+- `campaign.model.js` - `campaigns` table (with language support)
+- `event.model.js` - `events` table (with language support)
+- `program.model.js` - `programs` table (with language support)
+- `post.model.js` - `posts` table (with language support)
+- `media.model.js` - `media` table (with language support)
+- `document.model.js` - `documents` table (with language support)
+- `testimonial.model.js` - `testimonials` table (with language support)
+- `partner.model.js` - `partners` table (with language support)
+- `faq.model.js` - `faqs` table (with language support)
+
+### **Relationship Models:**
+- `eventParticipant.model.js` - `event_participants` table
+- `volunteerSkill.model.js` - `volunteer_skills` table
+- `donation.model.js` - `donations` table
+
+### **System Models:**
+- `skill.model.js` - `skills` table
+- `contactMessage.model.js` - `contact_messages` table
+- `newsletterSubscriber.model.js` - `newsletter_subscribers` table
+- `siteInteraction.model.js` - `site_interactions` table
+- `emailLog.model.js` - `email_logs` table
+- `rolePermission.model.js` - `role_permissions` table
+
+---
+
+## 🌐 Multilingual Support Files
+
+### **Translation Service:**
+- `translation.service.js` - Handles multilingual content operations
+- `translation.util.js` - Translation utilities and helpers
+- `translation.validator.js` - Validation for translation operations
+
+### **Language Middleware:**
+- `language.middleware.js` - Detects and sets user language preference
+
+---
+
+## 🛠️ Skills Management Files
+
+### **Skills System:**
+- `skill.controller.js` - Skills CRUD operations
+- `skill.routes.js` - Skills API routes
+- `skill.service.js` - Skills business logic
+- `skill.validator.js` - Skills validation
+- `skill.model.js` - Skills table model
+- `volunteerSkill.model.js` - Volunteer-skill relationships
+
+---
