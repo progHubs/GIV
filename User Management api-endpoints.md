@@ -1,4 +1,4 @@
-# 🚀 GIV Society Backend API Documentation
+# User Management API Documentation
 
 ## 📋 Overview
 
